@@ -1,6 +1,16 @@
-# Real-Time Chat Application
+# Real-Time Chat Application(Pure WebSocket)
 
-A simple real-time chat application built using Node.js and pure WebSockets.
+WebSocket is a protocol just like http.Both client and server side application understand WebSocket.
+Try and write following in console
+
+```
+WebSocket
+
+```
+
+But socket.io is made over WebSocket to make the setup fast. But for better understanding one should build a project out of pur
+
+A simple real-time chat application built using Node.js and pure WebSockets just like this one.
 
 ## Basics
 
