@@ -16,6 +16,7 @@ const userManager = new UserManager();
 const store = new InMemoryStore();
 
 wss.on("connection", function connection(ws) {
+  console.log(`User connected at ${Date()}`);
   //add rate limiting
   ws.on("error", console.error);
 
@@ -33,6 +34,7 @@ function messageHandler(ws: WebSocket, message: IncomingMessage) {
   if (message.type === InSupportedMessage.JoinRoom) {
     const payload = message.payload;
     userManager.addUser(payload.userId, payload.roomId, payload.name, ws);
+    // store.initRoom(payload.roomId);
   }
   if (message.type === InSupportedMessage.SendMessage) {
     const payload = message.payload;
@@ -56,7 +58,7 @@ function messageHandler(ws: WebSocket, message: IncomingMessage) {
       },
     };
 
-    userManager.broadcast(payload.roomId, payload.userId, outmessage, ws);
+    userManager.broadcast(payload.roomId, payload.userId, outmessage);
   }
   if (message.type === InSupportedMessage.UpvoteMessage) {
     const payload = message.payload;
@@ -80,7 +82,7 @@ function messageHandler(ws: WebSocket, message: IncomingMessage) {
       },
     };
 
-    userManager.broadcast(payload.roomId, payload.userId, outmessage, ws);
+    userManager.broadcast(payload.roomId, payload.userId, outmessage);
   }
 }
 

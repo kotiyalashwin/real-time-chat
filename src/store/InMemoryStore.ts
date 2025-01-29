@@ -34,8 +34,10 @@ export class InMemoryStore implements Store {
   }
 
   addChats(roomId: string, userId: userId, name: string, message: string) {
+    if (!this.store.get(roomId)) {
+      this.initRoom(roomId);
+    }
     const room = this.store.get(roomId);
-
     if (!room) {
       return;
     }

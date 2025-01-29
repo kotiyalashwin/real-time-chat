@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <script>
+    const userId = Math.floor(Math.random() * 10000);
+    const ws = new WebSocket("ws://localhost:8080");
+    ws.onopen = function () {
+      ws.send(
+        JSON.stringify({
+          type: "Join_Room",
+          payload: {
+            name: "ashwin",
+            userId: userId,
+            roomId: "1",
+          },
+        })
+      );
+    };
+    //recieve from backend ws.send()
+    function sendMessage() {
+      ws.send(
+        JSON.stringify({
+          type: "Send_Message",
+          payload: {
+            message: document.getElementById("outMessage").value,
+            userId: userId,
+            roomId: "1",
+          },
+        })
+      );
+    }
+    ws.onmessage = function (event) {
+      const { type, payload } = event.data;
+      if (type === "Add_Chat") {
+        const TextBox = document.createElement("p");
+        TextBox.innerHTML = payload.message;
+        TextBox.innerHTML = document.getElementById("box").appendChild(TextBox);
+      }
+    };
+  </script>
+  <body>
+    <input type="text" id="outMessage" />
+    <div id="box"></div>
+    <button onclick="sendMessage()">SendChat</button>
+  </body>
+</html>

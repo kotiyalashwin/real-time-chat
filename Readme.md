@@ -8,9 +8,9 @@ WebSocket
 
 ```
 
-But socket.io is made over WebSocket to make the setup fast. But for better understanding one should build a project out of pur
+But socket.io is made over WebSocket to make the setup fast. But for better understanding one should build a project out of pure WebSocket just like this one.
 
-A simple real-time chat application built using Node.js and pure WebSockets just like this one.
+A simple real-time chat application built using Node.js and WebSockets.
 
 ## Basics
 

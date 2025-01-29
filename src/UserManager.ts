@@ -45,12 +45,7 @@ export class UserManager {
     return user ?? null;
   }
 
-  broadcast(
-    roomId: string,
-    userId: string,
-    message: OutgoingMessage,
-    socket: WebSocket
-  ) {
+  broadcast(roomId: string, userId: string, message: OutgoingMessage) {
     const user = this.getUser(roomId, userId);
     if (!user) {
       console.error("User not found");
@@ -61,9 +56,11 @@ export class UserManager {
       console.error("Room Does not exist");
       return;
     }
-
-    room.users.forEach(({ ws }) => {
-      socket.send(JSON.stringify(message));
+    const users = room.users.filter(({ id }) => {
+      id !== userId;
+    });
+    users.forEach(({ ws }) => {
+      ws.send(JSON.stringify(message));
     });
   }
 }
