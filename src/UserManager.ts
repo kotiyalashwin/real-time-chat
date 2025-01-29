@@ -1,4 +1,8 @@
 import WebSocket from "ws";
+import {
+  OutgoingMessage,
+  SupportedMessages,
+} from "./messages/broadcastMessage";
 
 type User = {
   id: string;
@@ -39,5 +43,27 @@ export class UserManager {
   getUser(roomId: string, userId: string): User | null {
     const user = this.room.get(roomId)?.users.find(({ id }) => id === userId);
     return user ?? null;
+  }
+
+  broadcast(
+    roomId: string,
+    userId: string,
+    message: OutgoingMessage,
+    socket: WebSocket
+  ) {
+    const user = this.getUser(roomId, userId);
+    if (!user) {
+      console.error("User not found");
+      return;
+    }
+    const room = this.room.get(roomId);
+    if (!room) {
+      console.error("Room Does not exist");
+      return;
+    }
+
+    room.users.forEach(({ ws }) => {
+      socket.send(JSON.stringify(message));
+    });
   }
 }

@@ -1,13 +1,17 @@
 import WebSocket, { WebSocketServer } from "ws";
+import { SupportedMessages as OutSupportedMessage } from "./messages/broadcastMessage";
 import {
   IncomingMessage,
   InitMessageType,
-  SupportedMessages,
+  SupportedMessages as InSupportedMessage,
 } from "./messages/incomingMessages";
 import { UserManager } from "./UserManager";
 import { InMemoryStore } from "./store/InMemoryStore";
+import http from "http";
 
-const wss = new WebSocketServer({ port: 8080 });
+const server = http.createServer();
+
+const wss = new WebSocketServer({ server });
 const userManager = new UserManager();
 const store = new InMemoryStore();
 
@@ -26,11 +30,11 @@ wss.on("connection", function connection(ws) {
 });
 
 function messageHandler(ws: WebSocket, message: IncomingMessage) {
-  if (message.type === SupportedMessages.JoinRoom) {
+  if (message.type === InSupportedMessage.JoinRoom) {
     const payload = message.payload;
     userManager.addUser(payload.userId, payload.roomId, payload.name, ws);
   }
-  if (message.type === SupportedMessages.SendMessage) {
+  if (message.type === InSupportedMessage.SendMessage) {
     const payload = message.payload;
 
     //check user exists in the room
@@ -42,14 +46,44 @@ function messageHandler(ws: WebSocket, message: IncomingMessage) {
 
     store.addChats(payload.roomId, payload.userId, user?.name, payload.message);
     /// add broadcast logIc
+    const outmessage = {
+      type: OutSupportedMessage.AddChat,
+      payload: {
+        name: user.name,
+        roomId: payload.roomId,
+        upvotes: 0,
+        messaege: payload.message,
+      },
+    };
+
+    userManager.broadcast(payload.roomId, payload.userId, outmessage, ws);
   }
-  if (message.type === SupportedMessages.UpvoteMessage) {
+  if (message.type === InSupportedMessage.UpvoteMessage) {
     const payload = message.payload;
     const user = userManager.getUser(payload.roomId, payload.userId);
     if (!user) {
       console.error("User not exist in this room");
       return;
     }
-    store.upvote(payload.roomId, payload.chatId, payload.userId);
+    const chat = store.upvote(payload.roomId, payload.chatId, payload.userId);
+
+    if (!chat) {
+      return;
+    }
+    //upvotes
+    const outmessage = {
+      type: OutSupportedMessage.UpdateChat,
+      payload: {
+        upvotes: chat.upvotes.length,
+        roomId: payload.roomId,
+        chatId: payload.chatId,
+      },
+    };
+
+    userManager.broadcast(payload.roomId, payload.userId, outmessage, ws);
   }
 }
+
+server.listen(8080, () => {
+  console.log(`${Date()}: Server Running`);
+});
