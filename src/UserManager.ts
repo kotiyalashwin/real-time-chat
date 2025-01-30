@@ -47,18 +47,21 @@ export class UserManager {
 
   broadcast(roomId: string, userId: string, message: OutgoingMessage) {
     const user = this.getUser(roomId, userId);
+    // console.log(`Send from ${user?.id}`);
     if (!user) {
       console.error("User not found");
       return;
     }
     const room = this.room.get(roomId);
+    // console.log(room?.users);
     if (!room) {
       console.error("Room Does not exist");
       return;
     }
-    const users = room.users.filter(({ id }) => {
-      id !== userId;
-    });
+    const users = room.users.filter(({ id }) => id !== userId);
+    // console.log(users);
+    // console.log("Sending To" + users);
+    console.log(message);
     users.forEach(({ ws }) => {
       ws.send(JSON.stringify(message));
     });

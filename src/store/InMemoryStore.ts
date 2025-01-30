@@ -18,6 +18,8 @@ export class InMemoryStore implements Store {
       roomId,
       chats: [],
     });
+
+    // console.log(this.store.get(roomId));
   }
 
   getChats(limit: number, offset: number, roomId: string) {
@@ -49,6 +51,8 @@ export class InMemoryStore implements Store {
       message,
       upvotes: [],
     });
+
+    console.log(room.chats);
   }
 
   upvote(roomId: string, chatId: string, userId: string) {

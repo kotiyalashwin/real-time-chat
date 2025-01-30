@@ -21,20 +21,22 @@ wss.on("connection", function connection(ws) {
   ws.on("error", console.error);
 
   ws.on("message", function message(data, isbinary) {
+    console.log(data);
+    console.log(JSON.parse(data.toString()));
     try {
       messageHandler(ws, JSON.parse(data.toString()));
     } catch {}
   });
 
   //   console.log(wss.clients);
-  ws.send("Connected to the websocket");
+  ws.send(JSON.stringify("Connected to the websocket"));
 });
 
 function messageHandler(ws: WebSocket, message: IncomingMessage) {
   if (message.type === InSupportedMessage.JoinRoom) {
     const payload = message.payload;
     userManager.addUser(payload.userId, payload.roomId, payload.name, ws);
-    // store.initRoom(payload.roomId);
+    store.initRoom(payload.roomId);
   }
   if (message.type === InSupportedMessage.SendMessage) {
     const payload = message.payload;

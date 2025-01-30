@@ -14,7 +14,7 @@
           type: "Join_Room",
           payload: {
             name: "ashwin",
-            userId: userId,
+            userId: String(userId),
             roomId: "1",
           },
         })
@@ -22,23 +22,35 @@
     };
     //recieve from backend ws.send()
     function sendMessage() {
+      console.log(
+        JSON.stringify({
+          type: "Send_Message",
+          payload: {
+            message: document.getElementById("outMessage").value,
+            userId: String(userId),
+            roomId: "1",
+          },
+        })
+      );
       ws.send(
         JSON.stringify({
           type: "Send_Message",
           payload: {
             message: document.getElementById("outMessage").value,
-            userId: userId,
+            userId: String(userId),
             roomId: "1",
           },
         })
       );
     }
     ws.onmessage = function (event) {
-      const { type, payload } = event.data;
-      if (type === "Add_Chat") {
+      const data = JSON.parse(event.data);
+      const { type, payload } = data;
+      console.log(type, payload);
+      if (type === "Add_chat") {
         const TextBox = document.createElement("p");
-        TextBox.innerHTML = payload.message;
-        TextBox.innerHTML = document.getElementById("box").appendChild(TextBox);
+        TextBox.innerHTML = payload.messaege;
+        document.getElementById("box").appendChild(TextBox);
       }
     };
   </script>
